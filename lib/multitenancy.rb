@@ -28,7 +28,7 @@ require "multitenancy/active_record/switch_db"
 require "multitenancy/tenant"
 require "multitenancy/rack/filter"
 require "multitenancy/model_extensions"
-require "multitenancy/rest_client/rest_client.rb"
+require "multitenancy/rest_client/rest_client.rb" if defined? RestClient
 
 module Multitenancy
   
