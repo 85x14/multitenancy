@@ -59,7 +59,23 @@ module Multitenancy
     def db_type
       @@db_type
     end
-    
+
+    def db_config_filename
+      @@db_config_filename
+    end
+
+    def db_config_filename=(filename)
+      @@db_config_filename = filename
+    end
+
+    def db_config_prefix
+      @@db_config_prefix
+    end
+
+    def db_config_suffix
+      @@db_config_suffix
+    end
+
     def logger
       @@logger
     end

@@ -17,9 +17,15 @@ class ActiveRecord::Base
 
     def switch_db(db, &block)
       Thread.current[:current_db] = db
+
       unless ActiveRecord::Base.connection_handler.retrieve_connection_pool(ActiveRecord::Base)
-        db_config = ActiveRecord::Base.configurations[db]
-        raise ActiveRecord::AdapterNotFound, "#{db} database configuration does not exist" if db_config.nil?
+        # if the database config doesn't exist, try to reload the db config in case a tenant has been added on the fly
+        db_config = ActiveRecord::Base.configurations[db.to_s]
+        if db_config.nil?
+          ActiveRecord::Base.configurations = YAML.load_file(Multitenancy.db_config_filename)
+          db_config = ActiveRecord::Base.configurations[db.to_s]
+          raise ActiveRecord::AdapterNotFound, "#{db} database configuration does not exist" if db_config.nil?
+        end
 
         ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations[db])
       end
