@@ -26,9 +26,11 @@ require "active_model"
 require "multitenancy/version"
 require "multitenancy/active_record/switch_db"
 require "multitenancy/tenant"
-require "multitenancy/rack/filter"
+require "multitenancy/middleware/rails_requests"
+require "multitenancy/middleware/sidekiq_client"
+require "multitenancy/middleware/sidekiq_server"
 require "multitenancy/model_extensions"
-require "multitenancy/rails"
+require "multitenancy/railtie"
 require "multitenancy/rest_client/rest_client.rb" if defined? RestClient
 
 module Multitenancy

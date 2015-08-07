@@ -27,7 +27,7 @@ class ActiveRecord::Base
           raise ActiveRecord::AdapterNotFound, "#{db} database configuration does not exist" if db_config.nil?
         end
 
-        ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations[db])
+        ActiveRecord::Base.establish_connection(db_config)
       end
       yield
     ensure

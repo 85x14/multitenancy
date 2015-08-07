@@ -1,13 +1,12 @@
-module Multitenancy
-  
-  class Filter
-    
+module Multitenancy::Middleware
+
+  class RailsRequests
     def initialize(app)
       @app = app
     end
     
     def call(env)
-      tenant = Tenant.new tenant_id(env), sub_tenant_id(env)
+      tenant = Multitenancy::Tenant.new tenant_id(env), sub_tenant_id(env)
       Multitenancy.with_tenant tenant do
         @app.call env
       end
