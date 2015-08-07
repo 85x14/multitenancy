@@ -11,6 +11,12 @@ module Multitenancy
       Multitenancy.with_tenant tenant do
         @app.call env
       end
+    rescue  ActiveRecord::AdapterNotFound
+      [
+        404,
+        { 'Content-Type'  => 'text/html' },
+        File.open('public/404.html', File::RDONLY)
+      ]
     end
     
     private
