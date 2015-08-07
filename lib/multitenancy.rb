@@ -44,6 +44,8 @@ module Multitenancy
     def init(config)
       @@tenant_header = config[:tenant_header]
       @@sub_tenant_header = config[:sub_tenant_header]
+      @@tenant_header_regexp = config[:tenant_header_subdomain]
+      @@sub_tenant_header_regexp = config[:sub_tenant_header_regexp]
       @@logger = config[:logger] if config[:logger]
       @@append_headers_to_rest_calls = config[:append_headers_to_rest_calls] unless config[:append_headers_to_rest_calls].nil?
       @@db_config_prefix = config[:db_config_prefix] unless config[:db_config_prefix].nil?
@@ -65,6 +67,14 @@ module Multitenancy
     
     def sub_tenant_header
       @@sub_tenant_header
+    end
+
+    def tenant_header_regexp
+      @@tenant_header_regexp
+    end
+
+    def sub_tenant_header_regexp
+      @@sub_tenant_header_regexp
     end
     
     def append_headers_to_rest_calls?
