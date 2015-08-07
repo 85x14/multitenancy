@@ -35,6 +35,8 @@ module Multitenancy
   
   @@tenant_header = 'X_TENANT_ID'
   @@sub_tenant_header = 'X_SUB_TENANT_ID'
+  @@tenant_header_regexp = nil
+  @@sub_tenant_header_regexp = nil
   @@append_headers_to_rest_calls = true
   @@logger = (logger rescue nil) || Logger.new(STDOUT)
   @@db_config_prefix = ''
@@ -45,7 +47,7 @@ module Multitenancy
     def init(config)
       @@tenant_header = config[:tenant_header]
       @@sub_tenant_header = config[:sub_tenant_header]
-      @@tenant_header_regexp = config[:tenant_header_subdomain]
+      @@tenant_header_regexp = config[:tenant_header_regexp]
       @@sub_tenant_header_regexp = config[:sub_tenant_header_regexp]
       @@logger = config[:logger] if config[:logger]
       @@append_headers_to_rest_calls = config[:append_headers_to_rest_calls] unless config[:append_headers_to_rest_calls].nil?

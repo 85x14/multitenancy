@@ -18,6 +18,9 @@ class ActiveRecord::Base
     def switch_db(db, &block)
       Thread.current[:current_db] = db
       unless ActiveRecord::Base.connection_handler.retrieve_connection_pool(ActiveRecord::Base)
+        db_config = ActiveRecord::Base.configurations[db]
+        raise ActiveRecord::AdapterNotFound, "#{db} database configuration does not exist" if db_config.nil?
+
         ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations[db])
       end
       yield
