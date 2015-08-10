@@ -101,6 +101,13 @@ module Multitenancy
     def append_headers_to_rest_calls?
       @@append_headers_to_rest_calls
     end
+
+    def switch_tenant(tenant)
+      self.current_tenant = tenant
+      if db_type != :shared
+        ActiveRecord::Base.switch_db("#{@@db_config_prefix}#{tenant.tenant_id}#{@@db_config_suffix}".to_sym)
+      end
+    end
     
     def with_tenant(tenant, &block)
       self.logger.debug "Executing the block with the tenant - #{tenant}"
@@ -113,7 +120,7 @@ module Multitenancy
         if db_type == :shared
           return block.call
         else
-          return ActiveRecord::Base.switch_db("#{@@db_config_prefix}#{tenant.tenant_id}#{@@db_config_suffix}".to_sym, &block)
+          return ActiveRecord::Base.with_db("#{@@db_config_prefix}#{tenant.tenant_id}#{@@db_config_suffix}".to_sym, &block)
         end
       ensure
         self.current_tenant = old_tenant

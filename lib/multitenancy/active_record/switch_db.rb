@@ -15,7 +15,7 @@ class ActiveRecord::Base
     alias_method :connection_handler_without_multi_db_support, :connection_handler      
     alias_method :connection_handler, :connection_handler_with_multi_db_support
 
-    def switch_db(db, &block)
+    def switch_db(db)
       Thread.current[:current_db] = db
 
       unless ActiveRecord::Base.connection_handler.retrieve_connection_pool(ActiveRecord::Base)
@@ -24,16 +24,24 @@ class ActiveRecord::Base
         if db_config.nil?
           ActiveRecord::Base.configurations = YAML.load_file(Multitenancy.db_config_filename)
           db_config = ActiveRecord::Base.configurations[db.to_s]
-          raise ActiveRecord::AdapterNotFound, "#{db} database configuration does not exist" if db_config.nil?
+
+          if db_config.nil?
+            err_msg = "#{db} database configuration does not exist"
+            Multitenancy.logger.warn err_msg
+            raise ActiveRecord::AdapterNotFound, err_msg
+          end
         end
 
         ActiveRecord::Base.establish_connection(db_config)
       end
+    end
+
+    def with_db(db, &block)
+      switch_db(db)
       yield
     ensure
       ActiveRecord::Base.connection_handler.clear_active_connections! rescue puts "supressing error while clearing connections - #{$!.inspect}"
       Thread.current[:current_db] = nil
     end
-    
   end
 end
