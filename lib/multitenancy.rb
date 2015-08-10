@@ -110,7 +110,6 @@ module Multitenancy
     end
     
     def with_tenant(tenant, &block)
-      self.logger.debug "Executing the block with the tenant - #{tenant}"
       if block.nil?
         raise ArgumentError, "block required"
       end
@@ -128,7 +127,6 @@ module Multitenancy
     end
     
     def current_tenant=(tenant)
-      self.logger.debug "Setting the current tenant to - #{tenant}"
       Thread.current[:tenant] = tenant
     end
     
