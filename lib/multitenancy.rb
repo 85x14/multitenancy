@@ -44,6 +44,7 @@ module Multitenancy
   @@db_config_prefix = ''
   @@db_config_suffix = '_development'
   @@db_type = :shared # or :dedicated
+  @@exclude_paths = []
 
   class << self
     def init(config)
@@ -55,7 +56,8 @@ module Multitenancy
       @@append_headers_to_rest_calls = config[:append_headers_to_rest_calls] unless config[:append_headers_to_rest_calls].nil?
       @@db_config_prefix = config[:db_config_prefix] unless config[:db_config_prefix].nil?
       @@db_config_suffix = config[:db_config_suffix] unless config[:db_config_suffix].nil?
-      @@db_type = (config[:db_type].nil? || ![:shared, :dedicated].include?(config[:db_type])) ? :shared : config[:db_type] 
+      @@db_type = (config[:db_type].nil? || ![:shared, :dedicated].include?(config[:db_type])) ? :shared : config[:db_type]
+      @@exclude_paths = config[:exclude_paths] unless config[:exclude_paths].nil?
     end
     
     def db_type
@@ -96,6 +98,10 @@ module Multitenancy
 
     def sub_tenant_header_regexp
       @@sub_tenant_header_regexp
+    end
+
+    def exclude_paths
+      @@exclude_paths
     end
     
     def append_headers_to_rest_calls?

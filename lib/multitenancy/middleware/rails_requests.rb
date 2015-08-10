@@ -7,8 +7,12 @@ module Multitenancy::Middleware
     
     def call(env)
       tenant = Multitenancy::Tenant.new tenant_id(env), sub_tenant_id(env)
-      Multitenancy.with_tenant tenant do
+      if exclude_request?(env)
         @app.call env
+      else
+        Multitenancy.with_tenant tenant do
+          @app.call env
+        end
       end
     rescue  ActiveRecord::AdapterNotFound
       [
@@ -38,6 +42,10 @@ module Multitenancy::Middleware
         match = Multitenancy.sub_tenant_header_regexp.match(id)
         match ? match[0] : id
       end
+    end
+
+    def exclude_request?(env)
+      Multitenancy.exclude_paths.include? env['PATH_INFO']
     end
   end
 end
