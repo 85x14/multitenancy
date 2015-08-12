@@ -12,6 +12,12 @@ module Multitenancy
           config.server_middleware do |chain|
             chain.add Multitenancy::Middleware::SidekiqServer
           end
+
+          # need the client middleware on the server as well, as
+          # the server may load additional requests
+          config.client_middleware do |chain|
+            chain.add Multitenancy::Middleware::SidekiqClient
+          end
         end
 
         Sidekiq.configure_client do |config|
