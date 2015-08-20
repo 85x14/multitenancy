@@ -23,4 +23,26 @@ namespace :multitenancy do
     ActiveRecord::Tasks::DatabaseTasks.create(reloaded_config[db_config_name])
     ActiveRecord::Tasks::DatabaseTasks.load_schema_for(db_config_name)
   end
+
+  task :migrate_all_dbs, [:base_db_config] => [:environment] do |t, args|
+    base_db_config = args[:base_db_config] || Multitenancy.db_config_suffix.gsub(/^_+/,'')
+
+    # calculate migration paths based on the base db configuration
+    ActiveRecord::Base.switch_db(base_db_config)
+    migration_paths = Multitenancy::Migrator.migrations_paths
+
+    # find all tenant dbs with that match the suffix
+    tenant_dbs = [base_db_config]
+    unless Multitenancy.db_type == :shared
+      ActiveRecord::Base.configurations.each do |key, val|
+        if Multitenancy.db_config_suffix && key =~ /(.+)#{Multitenancy.db_config_suffix}$/
+          tenant_dbs << key
+        end
+      end
+    end
+
+    # run default of :up for all unprocessed migrations
+    Multitenancy::Migrator.tenant_dbs = tenant_dbs
+    Multitenancy::Migrator.migrate(migration_paths)
+  end
 end

@@ -25,6 +25,7 @@ require "active_record"
 require "active_model"
 require "multitenancy/version"
 require "multitenancy/active_record/switch_db"
+require "multitenancy/active_record/migrator"
 require "multitenancy/tenant"
 require "multitenancy/middleware/rails_requests"
 require "multitenancy/middleware/sidekiq_client"
@@ -80,6 +81,10 @@ module Multitenancy
       @@db_config_suffix
     end
 
+    def db_config_name(tenant)
+      "#{@@db_config_prefix}#{tenant.tenant_id}#{@@db_config_suffix}".to_sym
+    end
+
     def logger
       @@logger
     end
@@ -111,7 +116,7 @@ module Multitenancy
     def switch_tenant(tenant)
       self.current_tenant = tenant
       if db_type != :shared
-        ActiveRecord::Base.switch_db("#{@@db_config_prefix}#{tenant.tenant_id}#{@@db_config_suffix}".to_sym)
+        ActiveRecord::Base.switch_db(Multitenancy.db_config_name(tenant))
       end
     end
     

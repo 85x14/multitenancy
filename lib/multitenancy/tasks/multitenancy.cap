@@ -1,0 +1,14 @@
+namespace :deploy do
+  Rake::Task["migrate"].clear_actions
+
+  task :migrate => [:set_rails_env] do
+    on primary fetch(:migration_role) do
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          execute :rake, "multitenancy:migrate_all_dbs"
+        end
+      end
+    end
+  end
+end
+

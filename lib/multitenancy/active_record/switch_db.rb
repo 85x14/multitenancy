@@ -22,7 +22,7 @@ class ActiveRecord::Base
         # if the database config doesn't exist, try to reload the db config in case a tenant has been added on the fly
         db_config = ActiveRecord::Base.configurations[db.to_s]
         if db_config.nil?
-          ActiveRecord::Base.configurations = YAML.load_file(Multitenancy.db_config_filename)
+          ActiveRecord::Base.configurations = YAML.load_file(Multitenancy.db_config_filename).with_indifferent_access
           db_config = ActiveRecord::Base.configurations[db.to_s]
 
           if db_config.nil?
